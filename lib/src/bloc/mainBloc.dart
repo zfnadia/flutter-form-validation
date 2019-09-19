@@ -3,8 +3,8 @@ import 'package:flutter_form_validation/src/bloc/validators.dart';
 import 'package:rxdart/rxdart.dart';
 
 class MainBloc extends BlocBase with Validators {
-//-------------------BehaviorSubjects-----------------------------------------
 
+//-------------------BehaviorSubjects-----------------------------------------
   final _username = BehaviorSubject<String>();
   final _emailAddress = BehaviorSubject<String>();
   final _dateOfBirth = BehaviorSubject<DateTime>();
@@ -28,13 +28,10 @@ class MainBloc extends BlocBase with Validators {
 
   Stream<String> get aboutMe => _aboutMe.stream.transform(validateAboutMe);
 
-/*
-  Stream<bool> get userDataValid => Observable.combineLatest3(
-      username, emailAddress, phoneNumber, (u, e, p) => true);
-*/
+  Stream<bool> get mandatoryFieldsChecked => Observable.combineLatest4(
+      username, emailAddress, dateOfBirth, phoneNumber, (u, e, d, p) => true);
 
   //-----------------------Function---------------------------------------------
-
   Function(String) get sinkUsername => _username.sink.add;
 
   Function(String) get sinkEmailAddress => _emailAddress.sink.add;
@@ -48,7 +45,6 @@ class MainBloc extends BlocBase with Validators {
   Function(String) get sinkAboutMe => _aboutMe.sink.add;
 
   //----------------------------dispose-----------------------------------------
-
   @override
   void dispose() {
     _username.close();

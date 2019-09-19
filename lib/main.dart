@@ -1,3 +1,4 @@
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_validation/src/bloc/blocProvider.dart';
 import 'package:flutter_form_validation/src/bloc/mainBloc.dart';
@@ -25,8 +26,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   MainBloc _mainBloc;
-  TextEditingController _controller;
-  DateTime selectedDate = DateTime.now();
+  DateTime currentDate = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +51,8 @@ class _MyHomePageState extends State<MyHomePage> {
           SizedBox(
             height: 15.0,
           ),
-          _dateOfBirthPicker('Date of Birth', _mainBloc.dateOfBirth, Icons.date_range),
+          _dateOfBirthPicker('Date of Birth', _mainBloc.dateOfBirth,
+              _mainBloc.sinkDateOfBirth, Icons.date_range),
           SizedBox(
             height: 15.0,
           ),
@@ -68,7 +69,11 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           _reusableTextField('About Me', _mainBloc.aboutMe,
               _mainBloc.sinkAboutMe, Icons.assignment_ind,
-              inputFormatterLength: 150)
+              inputFormatterLength: 150),
+          SizedBox(
+              height: 20.0
+          ),
+          _saveButton('Save', _mainBloc.mandatoryFieldsChecked),
         ],
       ),
     );
@@ -103,28 +108,13 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Future<Null> _selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDate,
-        firstDate: DateTime(2015, 8),
-        lastDate: DateTime(2019, 12));
-    if (picked != null && picked != selectedDate) {
-      _mainBloc.sinkDateOfBirth(picked);
-    } else {
-      _mainBloc.sinkDateOfBirth(selectedDate);
-    }
-  }
-
-  Widget _dateOfBirthPicker(String labelText, Stream stream, IconData iconData) {
+  Widget _dateOfBirthPicker(String labelText, Stream stream,
+      Function sinkDateOfBirth, IconData iconData) {
     return StreamBuilder(
       stream: stream,
       initialData: '',
       builder: (context, snapshot) {
-        _controller.text = snapshot.data.toString();
-        return TextField(
-          controller: _controller,
-          onTap: () => _selectDate(context),
+        return DateTimeField(
           decoration: InputDecoration(
             labelStyle: Decorations.textFieldFocusLabelTextStyle(),
             focusedBorder: Decorations.textFieldFocusOutlineInputBorder(),
@@ -138,8 +128,45 @@ class _MyHomePageState extends State<MyHomePage> {
               color: Colors.grey,
             ),
           ),
+          format: DateFormat("yyyy-MM-dd"),
+          onShowPicker: (context, currentValue) {
+            return showDatePicker(
+                context: context,
+                firstDate: DateTime(1900),
+                initialDate: currentValue ?? currentDate,
+                lastDate: currentDate);
+          },
+          onChanged: (value) {
+            sinkDateOfBirth(value);
+          },
         );
       },
+    );
+  }
+
+  Widget _saveButton(String title, Stream stream) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Container(
+          height: 45,
+          child: StreamBuilder(
+              stream: stream,
+              builder: (context, snapshot) {
+                return RaisedButton(
+                  child: Text(
+                    title,
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                  color: Colors.green,
+                  splashColor: Colors.white30,
+                  onPressed: snapshot.hasData ? () {} : null,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(2)),
+                );
+              }),
+        ),
+      ],
     );
   }
 
@@ -147,7 +174,6 @@ class _MyHomePageState extends State<MyHomePage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _mainBloc = BlocProvider.of(context);
-    _controller = TextEditingController(text: "${DateFormat('yyyy-MM-dd').format(selectedDate)}");
   }
 
   @override

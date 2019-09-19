@@ -23,7 +23,14 @@ class Validators {
 
   final validateDateOfBirth = StreamTransformer<DateTime, DateTime>.fromHandlers(
     handleData: (dateOfBirth, sink) {
-      sink.add(dateOfBirth);
+      int minAge = 12;
+      int maxAge = 80;
+      int age = calculateAge(dateOfBirth);
+      print('Age $age');
+      if (age >= minAge && age <= maxAge)
+        sink.add(dateOfBirth);
+      else
+        sink.addError('Age should be between $minAge to $maxAge years');
     }
   );
 
@@ -57,7 +64,7 @@ class Validators {
       sink.addError('Details should be between $minLength to $maxLength characters');
   });
 
-  calculateAge(DateTime birthDate) {
+  static int calculateAge(DateTime birthDate) {
     DateTime currentDate = DateTime.now();
     int age = currentDate.year - birthDate.year;
     int month1 = currentDate.month;
