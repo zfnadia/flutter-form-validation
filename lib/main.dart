@@ -74,6 +74,9 @@ class _MyHomePageState extends State<MyHomePage> {
               height: 20.0
           ),
           _saveButton('Save', _mainBloc.mandatoryFieldsChecked),
+          SizedBox(
+            height: 40.0,
+          )
         ],
       ),
     );
