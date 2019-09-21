@@ -3,9 +3,9 @@ import 'dart:async';
 class Validators {
   final validateUsername = StreamTransformer<String, String>.fromHandlers(
       handleData: (username, sink) {
-    int minLength = 2;
+    int minLength = 4;
     int maxLength = 60;
-    if (username.length > minLength && username.length < maxLength)
+    if (username.length >= minLength && username.length <= maxLength)
       sink.add(username);
      else
       sink.addError('Username should be between $minLength to $maxLength chareaters');
@@ -37,7 +37,7 @@ class Validators {
   final validatePhoneNumber = StreamTransformer<String, String>.fromHandlers(
       handleData: (phoneNumber, sink) {
     bool isPhoneNumValid =
-        RegExp(r"^(?:\+88|01)?\d{11}$").hasMatch(phoneNumber);
+        RegExp(r"^(?:\+?88)?01[3-9]\d{8}$").hasMatch(phoneNumber);
     if (isPhoneNumValid)
       sink.add(phoneNumber);
     else

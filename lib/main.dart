@@ -1,5 +1,6 @@
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_form_validation/src/bloc/blocProvider.dart';
 import 'package:flutter_form_validation/src/bloc/mainBloc.dart';
 import 'package:intl/intl.dart';
@@ -42,12 +43,13 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           _reusableTextField('Username', _mainBloc.username,
               _mainBloc.sinkUsername, Icons.person,
-              inputFormatterLength: 60),
+              textInputType: TextInputType.text, inputFormatterLength: 60),
           SizedBox(
             height: 15.0,
           ),
           _reusableTextField('Email', _mainBloc.emailAddress,
-              _mainBloc.sinkEmailAddress, Icons.email),
+              _mainBloc.sinkEmailAddress, Icons.email,
+              textInputType: TextInputType.emailAddress),
           SizedBox(
             height: 15.0,
           ),
@@ -57,22 +59,21 @@ class _MyHomePageState extends State<MyHomePage> {
             height: 15.0,
           ),
           _reusableTextField('Phone Number', _mainBloc.phoneNumber,
-              _mainBloc.sinkPhoneNumber, Icons.phone),
+              _mainBloc.sinkPhoneNumber, Icons.phone,
+              textInputType: TextInputType.phone),
           SizedBox(
             height: 15.0,
           ),
           _reusableTextField('Address', _mainBloc.address,
               _mainBloc.sinkAddress, Icons.location_city,
-              inputFormatterLength: 100),
+              textInputType: TextInputType.text, inputFormatterLength: 100),
           SizedBox(
             height: 15.0,
           ),
           _reusableTextField('About Me', _mainBloc.aboutMe,
               _mainBloc.sinkAboutMe, Icons.assignment_ind,
-              inputFormatterLength: 150),
-          SizedBox(
-              height: 20.0
-          ),
+              textInputType: TextInputType.text, inputFormatterLength: 150),
+          SizedBox(height: 20.0),
           _saveButton('Save', _mainBloc.mandatoryFieldsChecked),
           SizedBox(
             height: 40.0,
@@ -84,12 +85,16 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _reusableTextField(String labelText, Stream stream,
       Function changeFunction, IconData iconData,
-      {int inputFormatterLength}) {
+      {TextInputType textInputType, int inputFormatterLength}) {
     return StreamBuilder(
       stream: stream,
       initialData: '',
       builder: (context, snapshot) {
         return TextField(
+          keyboardType: textInputType,
+          inputFormatters: [
+            LengthLimitingTextInputFormatter(inputFormatterLength)
+          ],
           onChanged: (value) {
             changeFunction(value);
           },
@@ -163,7 +168,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   color: Colors.green,
                   splashColor: Colors.white30,
-                  onPressed: snapshot.hasData ? () {} : null,
+                  onPressed: snapshot.hasData
+                      ? () {
+                          print('VALIDATION STREAM VALUE ${snapshot.data}');
+                        }
+                      : null,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(2)),
                 );
