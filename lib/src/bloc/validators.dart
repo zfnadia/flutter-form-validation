@@ -5,8 +5,11 @@ class Validators {
       handleData: (username, sink) {
     int minLength = 4;
     int maxLength = 60;
-    if (username.length >= minLength && username.length <= maxLength)
+    if (username.length >= minLength && username.length <= maxLength) {
+      print('IN VALIDATOR ${username.length}');
       sink.add(username);
+    }
+
      else
       sink.addError('Username should be between $minLength to $maxLength chareaters');
   });
@@ -38,7 +41,7 @@ class Validators {
       handleData: (phoneNumber, sink) {
     bool isPhoneNumValid =
         RegExp(r"^(?:\+?88)?01[3-9]\d{8}$").hasMatch(phoneNumber);
-    if (isPhoneNumValid)
+    if (isPhoneNumValid && phoneNumber.length != null)
       sink.add(phoneNumber);
     else
       sink.addError('Phone number is not valid!');

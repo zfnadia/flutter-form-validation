@@ -50,7 +50,7 @@ class _MyHomePageState extends State<MyHomePage> {
           _reusableTextField('Email', _mainBloc.emailAddress,
               _mainBloc.sinkEmailAddress, Icons.email,
               textInputType: TextInputType.emailAddress),
-          SizedBox(
+/*          SizedBox(
             height: 15.0,
           ),
           _dateOfBirthPicker('Date of Birth', _mainBloc.dateOfBirth,
@@ -72,7 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           _reusableTextField('About Me', _mainBloc.aboutMe,
               _mainBloc.sinkAboutMe, Icons.assignment_ind,
-              textInputType: TextInputType.text, inputFormatterLength: 150),
+              textInputType: TextInputType.text, inputFormatterLength: 150),*/
           SizedBox(height: 20.0),
           _saveButton('Save', _mainBloc.mandatoryFieldsChecked),
           SizedBox(
@@ -88,15 +88,24 @@ class _MyHomePageState extends State<MyHomePage> {
       {TextInputType textInputType, int inputFormatterLength}) {
     return StreamBuilder(
       stream: stream,
-      initialData: '',
+//      initialData: '',
       builder: (context, snapshot) {
+        if(snapshot.hasData && snapshot.data != null) {
+          print('MAIN SCREEN VALUE ${snapshot.data}');
+        } else {
+          print('MAIN SCREEN ERROR VALUE ${snapshot.data}');
+          print('MAIN SCREEN ERROR ${snapshot.error}');
+        }
+
         return TextField(
           keyboardType: textInputType,
           inputFormatters: [
             LengthLimitingTextInputFormatter(inputFormatterLength)
           ],
           onChanged: (value) {
+            print('CHANGED TEXT FIELD VALUE $value');
             changeFunction(value);
+            print('SNAPSHOT DATA AFTER CHANGE FUNCTION ${snapshot.data}');
           },
           decoration: InputDecoration(
             labelStyle: Decorations.textFieldFocusLabelTextStyle(),
@@ -161,6 +170,7 @@ class _MyHomePageState extends State<MyHomePage> {
           child: StreamBuilder(
               stream: stream,
               builder: (context, snapshot) {
+                print('FROM COMBINE LATEST ${snapshot.data}');
                 return RaisedButton(
                   child: Text(
                     title,
@@ -170,7 +180,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   splashColor: Colors.white30,
                   onPressed: snapshot.hasData
                       ? () {
-                          print('VALIDATION STREAM VALUE ${snapshot.data}');
+
                         }
                       : null,
                   shape: RoundedRectangleBorder(
@@ -190,8 +200,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void dispose() {
-    super.dispose();
     _mainBloc.clearAllData();
+    super.dispose();
   }
 }
 
