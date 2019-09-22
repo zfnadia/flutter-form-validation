@@ -1,102 +1,142 @@
 import 'package:flutter_form_validation/src/bloc/blocProvider.dart';
-import 'package:flutter_form_validation/src/bloc/validators.dart';
 import 'package:rxdart/rxdart.dart';
 
-class MainBloc extends BlocBase with Validators {
-
+class MainBloc extends BlocBase {
 //-------------------BehaviorSubjects-----------------------------------------
   final _username = BehaviorSubject<String>();
   final _isUsernameValid = BehaviorSubject<bool>();
   final _emailAddress = BehaviorSubject<String>();
   final _isEmailAddressValid = BehaviorSubject<bool>();
   final _dateOfBirth = BehaviorSubject<DateTime>();
+  final _isDateOfBirthValid = BehaviorSubject<bool>();
   final _phoneNumber = BehaviorSubject<String>();
+  final _isPhoneNumberValid = BehaviorSubject<bool>();
   final _address = BehaviorSubject<String>();
   final _aboutMe = BehaviorSubject<String>();
 
 //-----------------------Stream-----------------------------------------------
-//  Stream<String> get username => _username.stream.transform(validateUsername);
   Stream<String> get username => _username.stream;
-
-  Stream<bool> get isUsernameValid => _isUsernameValid.stream;
-
-/*  Stream<String> get emailAddress =>
-      _emailAddress.stream.transform(validateEmailAddress);*/
 
   Stream<String> get emailAddress => _emailAddress.stream;
 
-  Stream<bool> get isEmailAddressValid => _isEmailAddressValid.stream;
+  Stream<DateTime> get dateOfBirth => _dateOfBirth.stream;
 
-/*  Stream<DateTime> get dateOfBirth =>
-      _dateOfBirth.stream.transform(validateDateOfBirth);*/
+  Stream<String> get phoneNumber => _phoneNumber.stream;
 
-/*  Stream<String> get phoneNumber =>
-      _phoneNumber.stream.transform(validatePhoneNumber);
+  Stream<String> get address => _address.stream;
 
-  Stream<String> get address => _address.stream.transform(validateAddress);
+  Stream<String> get aboutMe => _aboutMe.stream;
 
-  Stream<String> get aboutMe => _aboutMe.stream.transform(validateAboutMe);*/
-
-/*  Stream<bool> get mandatoryFieldsChecked => Observable.combineLatest4(
-      username, emailAddress, dateOfBirth, phoneNumber, (u, e, d, p) => true);*/
-
-  Stream<bool> get mandatoryFieldsChecked => Observable.combineLatest2(
-      isUsernameValid, isEmailAddressValid, (u, e) {
-        if(_isUsernameValid.value && _isEmailAddressValid.value) {
+  Stream<bool> get mandatoryFieldsChecked => Observable.combineLatest4(
+          _isUsernameValid,
+          _isEmailAddressValid,
+          _isDateOfBirthValid,
+          _isPhoneNumberValid, (u, e, d, p) {
+        if (_isUsernameValid.value &&
+            _isEmailAddressValid.value &&
+            _isDateOfBirthValid.value &&
+            _isPhoneNumberValid.value) {
           return true;
         } else {
           return false;
         }
-  });
+      });
+
+//We can not use this as only combining streams here always returns true.
+/*
+  Stream<bool> get mandatoryFieldsChecked => Observable.combineLatest2(
+      isUsernameValid, isEmailAddressValid, (u, e) => true);
+*/
 
   //-----------------------Function---------------------------------------------
-  void sinkUsername (String username) {
+  void sinkUsername(String username) {
     int minLength = 4;
     int maxLength = 60;
     print('IN STREAM ${username.length}');
     if (username.length >= minLength && username.length <= maxLength) {
       _username.sink.add(username);
       _isUsernameValid.sink.add(true);
-    }
-    else {
-      _username.sink.addError('Username should be between $minLength to $maxLength chareaters');
+    } else {
+      _username.sink.addError(
+          'Username should be between $minLength to $maxLength chareaters');
       _isUsernameValid.sink.add(false);
     }
-
   }
 
-  void sinkEmailAddress (String emailAddress) {
-    int minLength = 4;
-    int maxLength = 60;
-    print('IN STREAM ${emailAddress.length}');
-    if (emailAddress.length >= minLength && emailAddress.length <= maxLength) {
+  void sinkEmailAddress(String emailAddress) {
+    bool isEmailValid = RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+        .hasMatch(emailAddress);
+    if (isEmailValid) {
       _emailAddress.sink.add(emailAddress);
       _isEmailAddressValid.sink.add(true);
-    }
-    else {
-      _emailAddress.sink.addError('Email address should be between $minLength to $maxLength chareaters');
+    } else {
+      _emailAddress.sink.addError('Email is not valid!');
       _isEmailAddressValid.sink.add(false);
     }
-
   }
 
-//  Function(String) get sinkUsername => _username.sink.add;
+  void sinkDateOfBirth(DateTime dateOfBirth) {
+    int minAge = 12;
+    int maxAge = 80;
+    int age = calculateAge(dateOfBirth);
+    print('Age $age');
+    if (age >= minAge && age <= maxAge) {
+      _dateOfBirth.sink.add(dateOfBirth);
+      _isDateOfBirthValid.sink.add(true);
+    } else {
+      _dateOfBirth.sink
+          .addError('Age should be between $minAge to $maxAge years');
+      _isDateOfBirthValid.sink.add(false);
+    }
+  }
 
-//  Function(String) get sinkEmailAddress => _emailAddress.sink.add;
+  void sinkPhoneNumber(String phoneNumber) {
+    bool isPhoneNumValid =
+        RegExp(r"^(?:\+?88)?01[3-9]\d{8}$").hasMatch(phoneNumber);
+    if (isPhoneNumValid && phoneNumber.length != null) {
+      _phoneNumber.sink.add(phoneNumber);
+      _isPhoneNumberValid.sink.add(true);
+    } else {
+      _phoneNumber.sink.addError('Phone number is not valid!');
+      _isPhoneNumberValid.sink.add(false);
+    }
+  }
 
-  Function(DateTime) get sinkDateOfBirth => _dateOfBirth.sink.add;
+  void sinkAddress(String address) {
+    int minLength = 4;
+    int maxLength = 100;
+    if (address.length >= minLength && address.length <= maxLength)
+      _address.sink.add(address);
+    else
+      _address.sink.addError(
+          'Address should be between $minLength to $maxLength characters');
+  }
 
-  Function(String) get sinkPhoneNumber => _phoneNumber.sink.add;
+  void sinkAboutMe(String aboutMe) {
+    int minLength = 4;
+    int maxLength = 150;
+    if (aboutMe.length >= minLength && aboutMe.length <= maxLength)
+      _aboutMe.sink.add(aboutMe);
+    else
+      _aboutMe.sink.addError(
+          'Details should be between $minLength to $maxLength characters');
+  }
 
-  Function(String) get sinkAddress => _address.sink.add;
-
-  Function(String) get sinkAboutMe => _aboutMe.sink.add;
-
-  submit() {
-    final validEmail = _emailAddress.value;
-    final validPassword = _phoneNumber.value;
-
-    print('Email is $validEmail, and password is $validPassword');
+  static int calculateAge(DateTime birthDate) {
+    DateTime currentDate = DateTime.now();
+    int age = currentDate.year - birthDate.year;
+    int month1 = currentDate.month;
+    int month2 = birthDate.month;
+    if (month2 > month1) {
+      age--;
+    } else if (month1 == month2) {
+      int day1 = currentDate.day;
+      int day2 = birthDate.day;
+      if (day2 > day1) {
+        age--;
+      }
+    }
+    return age;
   }
 
   //----------------------------dispose-----------------------------------------
@@ -107,7 +147,9 @@ class MainBloc extends BlocBase with Validators {
     _emailAddress.close();
     _isEmailAddressValid.close();
     _dateOfBirth.close();
+    _isDateOfBirthValid.close();
     _phoneNumber.close();
+    _isPhoneNumberValid.close();
     _address.close();
     _aboutMe.close();
   }
@@ -118,7 +160,9 @@ class MainBloc extends BlocBase with Validators {
     _emailAddress.value = null;
     _isEmailAddressValid.value = false;
     _dateOfBirth.value = null;
+    _isDateOfBirthValid.value = false;
     _phoneNumber.value = null;
+    _isPhoneNumberValid.value = null;
     _address.value = null;
     _aboutMe.value = null;
   }

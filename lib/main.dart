@@ -50,7 +50,7 @@ class _MyHomePageState extends State<MyHomePage> {
           _reusableTextField('Email', _mainBloc.emailAddress,
               _mainBloc.sinkEmailAddress, Icons.email,
               textInputType: TextInputType.emailAddress),
-/*          SizedBox(
+          SizedBox(
             height: 15.0,
           ),
           _dateOfBirthPicker('Date of Birth', _mainBloc.dateOfBirth,
@@ -72,7 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           _reusableTextField('About Me', _mainBloc.aboutMe,
               _mainBloc.sinkAboutMe, Icons.assignment_ind,
-              textInputType: TextInputType.text, inputFormatterLength: 150),*/
+              textInputType: TextInputType.text, inputFormatterLength: 150),
           SizedBox(height: 20.0),
           _saveButton('Save', _mainBloc.mandatoryFieldsChecked),
           SizedBox(
@@ -178,7 +178,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   color: Colors.green,
                   splashColor: Colors.white30,
-                  onPressed: snapshot.hasData && snapshot.data != false
+                  onPressed: snapshot.hasData && snapshot.data != false && snapshot.data != null
                       ? () {
 
                         }
