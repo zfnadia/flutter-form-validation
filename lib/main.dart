@@ -178,7 +178,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   color: Colors.green,
                   splashColor: Colors.white30,
-                  onPressed: snapshot.hasData
+                  onPressed: snapshot.hasData && snapshot.data != false
                       ? () {
 
                         }

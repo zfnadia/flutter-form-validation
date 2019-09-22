@@ -41,7 +41,13 @@ class MainBloc extends BlocBase with Validators {
       username, emailAddress, dateOfBirth, phoneNumber, (u, e, d, p) => true);*/
 
   Stream<bool> get mandatoryFieldsChecked => Observable.combineLatest2(
-      isUsernameValid, isEmailAddressValid, (u, e) => true);
+      isUsernameValid, isEmailAddressValid, (u, e) {
+        if(_isUsernameValid.value && _isEmailAddressValid.value) {
+          return true;
+        } else {
+          return false;
+        }
+  });
 
   //-----------------------Function---------------------------------------------
   void sinkUsername (String username) {
