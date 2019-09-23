@@ -105,7 +105,7 @@ class MainBloc extends BlocBase {
   void sinkAddress(String address) {
     int minLength = 4;
     int maxLength = 100;
-    if (address.length >= minLength && address.length <= maxLength)
+    if ((address.length >= minLength && address.length <= maxLength) || address.length == 0)
       _address.sink.add(address);
     else
       _address.sink.addError(
@@ -115,7 +115,7 @@ class MainBloc extends BlocBase {
   void sinkAboutMe(String aboutMe) {
     int minLength = 4;
     int maxLength = 150;
-    if (aboutMe.length >= minLength && aboutMe.length <= maxLength)
+    if ((aboutMe.length >= minLength && aboutMe.length <= maxLength) || aboutMe.length == 0)
       _aboutMe.sink.add(aboutMe);
     else
       _aboutMe.sink.addError(

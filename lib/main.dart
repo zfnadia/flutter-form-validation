@@ -1,9 +1,11 @@
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_cupertino_date_picker/flutter_cupertino_date_picker.dart';
 import 'package:flutter_form_validation/src/bloc/blocProvider.dart';
 import 'package:flutter_form_validation/src/bloc/mainBloc.dart';
 import 'package:intl/intl.dart';
+
 
 void main() => runApp(MyApp());
 
@@ -25,6 +27,10 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
+const String MIN_DATETIME = '1990-05-12';
+const String MAX_DATETIME = '2021-11-25';
+const String INIT_DATETIME = '2019-05-17';
+
 class _MyHomePageState extends State<MyHomePage> {
   MainBloc _mainBloc;
   DateTime currentDate = DateTime.now();
@@ -41,26 +47,31 @@ class _MyHomePageState extends State<MyHomePage> {
           SizedBox(
             height: 15.0,
           ),
-          _reusableTextField('Username', _mainBloc.username,
+          _reusableTextField('Username*', _mainBloc.username,
               _mainBloc.sinkUsername, Icons.person,
               textInputType: TextInputType.text, inputFormatterLength: 60),
           SizedBox(
             height: 15.0,
           ),
-          _reusableTextField('Email', _mainBloc.emailAddress,
+          _reusableTextField('Email*', _mainBloc.emailAddress,
               _mainBloc.sinkEmailAddress, Icons.email,
               textInputType: TextInputType.emailAddress),
           SizedBox(
             height: 15.0,
           ),
-          _dateOfBirthPicker('Date of Birth', _mainBloc.dateOfBirth,
+          _dateOfBirthPicker('Date of Birth*', _mainBloc.dateOfBirth,
               _mainBloc.sinkDateOfBirth, Icons.date_range),
           SizedBox(
             height: 15.0,
           ),
-          _reusableTextField('Phone Number', _mainBloc.phoneNumber,
+          _cupertinoDateOfBirthPicker('Date of Birth*', _mainBloc.dateOfBirth,
+              _mainBloc.sinkDateOfBirth, Icons.date_range),
+          SizedBox(
+            height: 15.0,
+          ),
+          _reusableTextField('Phone Number*', _mainBloc.phoneNumber,
               _mainBloc.sinkPhoneNumber, Icons.phone,
-              textInputType: TextInputType.phone),
+              textInputType: TextInputType.phone, whitelistingTextInputFormatter: WhitelistingTextInputFormatter.digitsOnly),
           SizedBox(
             height: 15.0,
           ),
@@ -85,7 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _reusableTextField(String labelText, Stream stream,
       Function changeFunction, IconData iconData,
-      {TextInputType textInputType, int inputFormatterLength}) {
+      {TextInputType textInputType, int inputFormatterLength, WhitelistingTextInputFormatter whitelistingTextInputFormatter}) {
     return StreamBuilder(
       stream: stream,
 //      initialData: '',
@@ -100,7 +111,7 @@ class _MyHomePageState extends State<MyHomePage> {
         return TextField(
           keyboardType: textInputType,
           inputFormatters: [
-            LengthLimitingTextInputFormatter(inputFormatterLength)
+            LengthLimitingTextInputFormatter(inputFormatterLength),
           ],
           onChanged: (value) {
             print('CHANGED TEXT FIELD VALUE $value');
@@ -155,6 +166,53 @@ class _MyHomePageState extends State<MyHomePage> {
           },
           onChanged: (value) {
             sinkDateOfBirth(value);
+          },
+        );
+      },
+    );
+  }
+
+  Widget _cupertinoDateOfBirthPicker(String labelText, Stream stream,
+      Function sinkDateOfBirth, IconData iconData) {
+    return StreamBuilder(
+      stream: stream,
+      initialData: '',
+      builder: (context, snapshot) {
+        return TextField(
+          decoration: InputDecoration(
+            labelStyle: Decorations.textFieldFocusLabelTextStyle(),
+            focusedBorder: Decorations.textFieldFocusOutlineInputBorder(),
+            border: Decorations.textFieldFocusOutlineInputBorder(),
+            labelText: labelText,
+            errorText: snapshot.hasError && snapshot.error is String
+                ? snapshot.error
+                : null,
+            prefixIcon: Icon(
+              iconData,
+              color: Colors.grey,
+            ),
+          ),
+//          format: DateFormat("yyyy-MM-dd"),
+       /*   onChanged: (value) {
+            sinkDateOfBirth(value);
+          },*/
+          onTap: () {
+            DatePicker.showDatePicker(
+              context,
+              pickerTheme: DateTimePickerTheme(
+              showTitle: true,
+                confirm: Text('custom Done', style: TextStyle(color: Colors.red)),
+                cancel: Text('custom cancel', style: TextStyle(color: Colors.cyan)),
+              ),
+              minDateTime: DateTime.parse(MIN_DATETIME),
+              maxDateTime: DateTime.parse(MAX_DATETIME),
+              initialDateTime: DateTime.parse(INIT_DATETIME),
+              dateFormat: 'yyyy-MMMM-dd',
+              onChange: (dateTime, List<int> index) {
+                print('CHANGED DATE ${dateTime.toString()}');
+                sinkDateOfBirth(dateTime);
+              },
+            );
           },
         );
       },
