@@ -174,11 +174,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _cupertinoDateOfBirthPicker(String labelText, Stream stream,
       Function sinkDateOfBirth, IconData iconData) {
+//    FocusNode _focusNode = new FocusNode();
     return StreamBuilder(
       stream: stream,
       initialData: '',
       builder: (context, snapshot) {
         return TextField(
+//          focusNode: _focusNode,
           decoration: InputDecoration(
             labelStyle: Decorations.textFieldFocusLabelTextStyle(),
             focusedBorder: Decorations.textFieldFocusOutlineInputBorder(),
@@ -197,6 +199,7 @@ class _MyHomePageState extends State<MyHomePage> {
             sinkDateOfBirth(value);
           },*/
           onTap: () {
+//            _focusNode.unfocus();
             DatePicker.showDatePicker(
               context,
               pickerTheme: DateTimePickerTheme(
@@ -213,6 +216,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 sinkDateOfBirth(dateTime);
               },
             );
+            SystemChannels.textInput.invokeMethod('TextInput.hide');
           },
         );
       },
