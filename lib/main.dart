@@ -6,6 +6,9 @@ import 'package:flutter_form_validation/src/bloc/blocProvider.dart';
 import 'package:flutter_form_validation/src/bloc/mainBloc.dart';
 import 'package:intl/intl.dart';
 
+/*const String MIN_DATETIME = '1990-05-12';
+const String MAX_DATETIME = '2021-11-25';
+const String INIT_DATETIME = '2019-05-17';*/
 
 void main() => runApp(MyApp());
 
@@ -27,14 +30,8 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-const String MIN_DATETIME = '1990-05-12';
-const String MAX_DATETIME = '2021-11-25';
-const String INIT_DATETIME = '2019-05-17';
-
 class _MyHomePageState extends State<MyHomePage> {
   MainBloc _mainBloc;
-  DateTime currentDate = DateTime.now();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,11 +58,11 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           _dateOfBirthPicker('Date of Birth*', _mainBloc.dateOfBirth,
               _mainBloc.sinkDateOfBirth, Icons.date_range),
-          SizedBox(
+/*          SizedBox(
             height: 15.0,
           ),
           _cupertinoDateOfBirthPicker('Date of Birth*', _mainBloc.dateOfBirth,
-              _mainBloc.sinkDateOfBirth, Icons.date_range),
+              _mainBloc.sinkDateOfBirth, Icons.date_range),*/
           SizedBox(
             height: 15.0,
           ),
@@ -142,6 +139,7 @@ class _MyHomePageState extends State<MyHomePage> {
       stream: stream,
       initialData: '',
       builder: (context, snapshot) {
+        print('12 years back ${DateTime.now().subtract(Duration(days: 4380))}');
         return DateTimeField(
           decoration: InputDecoration(
             labelStyle: Decorations.textFieldFocusLabelTextStyle(),
@@ -160,9 +158,9 @@ class _MyHomePageState extends State<MyHomePage> {
           onShowPicker: (context, currentValue) {
             return showDatePicker(
                 context: context,
-                firstDate: DateTime(1900),
-                initialDate: currentValue ?? currentDate,
-                lastDate: currentDate);
+                firstDate: DateTime(DateTime.now().year - 80, DateTime.now().month,DateTime.now().day),
+                initialDate: currentValue ?? DateTime(DateTime.now().year - 12, DateTime.now().month,DateTime.now().day),
+                lastDate: DateTime(DateTime.now().year - 12, DateTime.now().month,DateTime.now().day));
           },
           onChanged: (value) {
             sinkDateOfBirth(value);
@@ -172,15 +170,17 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _cupertinoDateOfBirthPicker(String labelText, Stream stream,
+  // Cupertino style date picker
+  //Issue: (In built keyboard pops up before the date picker is inflated)
+  /*Widget _cupertinoDateOfBirthPicker(String labelText, Stream stream,
       Function sinkDateOfBirth, IconData iconData) {
-//    FocusNode _focusNode = new FocusNode();
+    FocusNode _focusNode = new FocusNode();
     return StreamBuilder(
       stream: stream,
       initialData: '',
       builder: (context, snapshot) {
-        return TextField(
-//          focusNode: _focusNode,
+        return TextFormField(
+          focusNode: _focusNode,
           decoration: InputDecoration(
             labelStyle: Decorations.textFieldFocusLabelTextStyle(),
             focusedBorder: Decorations.textFieldFocusOutlineInputBorder(),
@@ -194,12 +194,8 @@ class _MyHomePageState extends State<MyHomePage> {
               color: Colors.grey,
             ),
           ),
-//          format: DateFormat("yyyy-MM-dd"),
-       /*   onChanged: (value) {
-            sinkDateOfBirth(value);
-          },*/
           onTap: () {
-//            _focusNode.unfocus();
+            _focusNode.unfocus();
             DatePicker.showDatePicker(
               context,
               pickerTheme: DateTimePickerTheme(
@@ -216,12 +212,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 sinkDateOfBirth(dateTime);
               },
             );
-            SystemChannels.textInput.invokeMethod('TextInput.hide');
           },
         );
       },
     );
-  }
+  }*/
 
   Widget _saveButton(String title, Stream stream) {
     return Row(
